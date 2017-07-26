@@ -94,7 +94,7 @@
                                                 iSize+=4;
                                         } else if (p1 == 0b11) {
                                                 p1 = vm.readMem(PC+iSize, 2);
-                                                p1 = vm.readMem(PC+p1, 4);
+                                                p1 = vm.readMem(PC+(p1%vm.modIndex), 4);
                                                 iSize+=2;
                                         } else vm.process_kill(process.pid, "illegal ld() p1");
                                         if (p2 == 0b01 && (p2=vm.readMem(PC+iSize, 1)-1) >= 0 && p2 < process.registers.length) {
@@ -349,7 +349,28 @@
                                 }, vm:this},
                         {code:0x0d, name:"lld", clock_cycles:10,
                                 call: function(process) {
-                                        process.instructionPtr = (process.instructionPtr+1)%vm.memorySize;
+                                        var PC = process.instructionPtr;
+                                        var format = vm.readMem(PC+1, 1);
+                                        var iSize = 2;
+                                        var p4 = (format&0b11);
+                                        var p3 = ((format>>2)&0b11);
+                                        var p2 = ((format>>4)&0b11);
+                                        var p1 = ((format>>6)&0b11);
+                                        if (p1 == 0b10) {
+                                                p1 = vm.readMem(PC+iSize, 4);
+                                                iSize+=4;
+                                        } else if (p1 == 0b11) {
+                                                p1 = vm.readMem(PC+iSize, 2);
+                                                p1 = vm.readMem(PC+p1, 4);
+                                                iSize+=2;
+                                        } else vm.process_kill(process.pid, "illegal lld() p1");
+                                        if (p2 == 0b01 && (p2=vm.readMem(PC+iSize, 1)-1) >= 0 && p2 < process.registers.length) {
+                                                process.registers[p2] = p1;
+                                                iSize+=1;
+                                        } else vm.process_kill(process.pid, "illegal lld() p2");
+                                        if (p3 != 0b00) vm.process_kill(process.pid, "illegal lld() p3");
+                                        if (p4 != 0b00) vm.process_kill(process.pid, "illegal lld() p4");
+                                        process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
                         {code:0x0e, name:"lldi", clock_cycles:50,
                                 call: function(process) {
@@ -357,7 +378,10 @@
                                 }, vm:this},
                         {code:0x0f, name:"lfork", clock_cycles:1000,
                                 call: function(process) {
-                                        process.instructionPtr = (process.instructionPtr+1)%vm.memorySize;
+                                        var PC = process.instructionPtr;
+                                        var index = vm.readMem(PC+1, 2);
+                                        vm.process_fork(process, vm.fold(PC+index));
+                                        process.instructionPtr = vm.fold(PC+3);
                                 }, vm:this},
                         {code:0x10, name:"aff", clock_cycles:2,
                                 call: function(process) {
@@ -471,7 +495,7 @@
                         process.alive = false;
                         console.log("killed process \""+process.name+"\" with pid: "+pid+" reason: "+why);
                         for (child in process.child) {
-                                this.process_kill(child.pid, "parent killed");
+                                this.process_kill(process.child[child], "parent killed");
                         }
                         return 0;
                 },
