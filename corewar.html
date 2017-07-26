@@ -411,15 +411,20 @@
                 },
                 readMem: function(index, size) {
                         var value = 0;
+                        var mask1 = 0x80;
+                        var mask2 = 0x100;
                         value = this.memory[index%this.memorySize].value;
                         while (--size > 0) {
                             ++index;
                             value = value << 8;
                             value = value + this.memory[index%this.memorySize].value;
+                            mask1 = mask1 << 8;
+                            mask2 = mask2 << 8;
                         }
-                        return value;
+                        return ((value & mask1) > 0 ? (value - mask2) : (value));
                 },
                 writeMem: function(index, value, size, owner) {
+                        if (value < 0) value = value + (0x1 << (8*size))
                         do {
                                 vm.memory[(index+(--size))%this.memorySize].value = (value&0xff);
                                 vm.memory[(index+(size))%this.memorySize].owner = owner;
@@ -616,7 +621,7 @@
                                 0x0b,0x68,0x01,0x00,0x0F,0x00,0x01,
                                 0x06,0x64,0x01,0x00,0x00,0x00,0x00,0x01,
                                 0x01,0x00,0x00,0x00,0x00,
-                                0x09,0,-5,
+                                0x09,0xFF,0xFB,
                                 0x00
                         ]});
 
