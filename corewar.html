@@ -385,7 +385,22 @@
                                 }, vm:this},
                         {code:0x10, name:"aff", clock_cycles:2,
                                 call: function(process) {
-                                        process.instructionPtr = (process.instructionPtr+1)%vm.memorySize;
+                                        var PC = process.instructionPtr;
+                                        var format = vm.readMem(PC+1, 1);
+                                        var iSize = 2;
+                                        var p4 = (format&0b11);
+                                        var p3 = ((format>>2)&0b11);
+                                        var p2 = ((format>>4)&0b11);
+                                        var p1 = ((format>>6)&0b11);
+                                        if (p1 == 0b01 && (p1=vm.readMem(PC+iSize, 1)-1) >= 0 && p1 < process.registers.length) {
+                                                p1 = process.registers[p1];
+                                                iSize+=1;
+                                                console.log(String.fromCharCode(p1));
+                                        } else vm.process_kill(process.pid, "illegal aff() p1");
+                                        if (p2 != 0b00) vm.process_kill(process.pid, "illegal aff() p2");
+                                        if (p3 != 0b00) vm.process_kill(process.pid, "illegal aff() p3");
+                                        if (p4 != 0b00) vm.process_kill(process.pid, "illegal aff() p4");
+                                        process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
                 ];
 	}
@@ -613,6 +628,13 @@
                                 0x06,0x64,0x01,0x00,0x00,0x00,0x00,0x01,
                                 0x01,0x00,0x00,0x00,0x00,
                                 0x09,0,-5,
+                                0x00
+                        ]});
+
+                vm.process_create({
+                        name:"print_pid",
+                        bin:[
+                                0x10,0x40,0x01,
                                 0x00
                         ]});
                 canvas = document.createElement('canvas');
