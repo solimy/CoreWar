@@ -498,7 +498,6 @@
                         father.child.push(child.pid);
                         this.processes.set(child.pid, child);
                         for (i = father.start, j = i+father.size; i < j; ++i) {
-                                console.log(i+" "+j);
                                 this.memory[index].value = this.memory[i%this.memorySize].value;
                                 this.memory[index].owner = child.pid;
                                 index = (index+1)%this.memorySize;
