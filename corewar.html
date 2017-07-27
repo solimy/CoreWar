@@ -508,7 +508,7 @@
                         } else while (!ok) {
 				index = Math.floor(Math.random()*this.memorySize);			
 				var keysIt = this.processes.keys();
-				for (processIt = keysIt.next(); processIt.value != undefined; processIt = keysIt.next()) {
+                                for (processIt = keysIt.next(); !ok && processIt.value != undefined; processIt = keysIt.next()) {
 					var process = this.processes.get(processIt.value);
                                         if (!(process.instructionPtr + process.size - index >= 0 && index+size - process.instructionPtr >= 0)) ok = true;
 				}
