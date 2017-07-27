@@ -123,7 +123,7 @@
                                                 iSize+=1;
                                         } else if (p2 == 0b11) {
                                                 p2 = vm.readMem(PC+iSize, 2);
-                                                vm.writeMem(PC+p2, p1, 4, process.pid);
+                                                vm.writeMem(PC+(p2%vm.modIndex), p1, 4, process.pid);
                                                 iSize+=2;
                                         } else vm.process_kill(process.pid, "illegal st() p2");
                                         if (p3 != 0b00) vm.process_kill(process.pid, "illegal st() p3");
@@ -197,7 +197,7 @@
                                                 iSize+=4;
                                         } else if (p1 == 0b11) {
                                                 p1 = vm.readMem(PC+iSize, 2);
-                                                p1 = vm.readMem(PC+p1, 4);
+                                                p1 = vm.readMem(PC+(p1%vm.modIndex), 4);
                                                 iSize+=2;
                                         } else vm.process_kill(process.pid, "illegal and() p1");
                                         if (p2 == 0b01 && (p2=vm.readMem(PC+iSize, 1)-1) >= 0 && p2 < process.registers.length) {
@@ -208,7 +208,7 @@
                                                 iSize+=4;
                                         } else if (p2 == 0b11) {
                                                 p2 = vm.readMem(PC+iSize, 2);
-                                                p2 = vm.readMem(PC+p2, 4);
+                                                p2 = vm.readMem(PC+(p2%vm.modIndex), 4);
                                                 iSize+=2;
                                         } else vm.process_kill(process.pid, "illegal and() p2");
                                         if (p3 == 0b01 && (p3=vm.readMem(PC+iSize, 1)-1) >= 0 && p3 < process.registers.length) {
@@ -236,7 +236,7 @@
                                                 iSize+=4;
                                         } else if (p1 == 0b11) {
                                                 p1 = vm.readMem(PC+iSize, 2);
-                                                p1 = vm.readMem(PC+p1, 4);
+                                                p1 = vm.readMem(PC+(p1%vm.modIndex), 4);
                                                 iSize+=2;
                                         } else vm.process_kill(process.pid, "illegal or() p1");
                                         if (p2 == 0b01 && (p2=vm.readMem(PC+iSize, 1)-1) >= 0 && p2 < process.registers.length) {
@@ -247,7 +247,7 @@
                                                 iSize+=4;
                                         } else if (p2 == 0b11) {
                                                 p2 = vm.readMem(PC+iSize, 2);
-                                                p2 = vm.readMem(PC+p2, 4);
+                                                p2 = vm.readMem(PC+(p2%vm.modIndex), 4);
                                                 iSize+=2;
                                         } else vm.process_kill(process.pid, "illegal or() p2");
                                         if (p3 == 0b01 && (p3=vm.readMem(PC+iSize, 1)-1) >= 0 && p3 < process.registers.length) {
@@ -275,7 +275,7 @@
                                                 iSize+=4;
                                         } else if (p1 == 0b11) {
                                                 p1 = vm.readMem(PC+iSize, 2);
-                                                p1 = vm.readMem(PC+p1, 4);
+                                                p1 = vm.readMem(PC+(p1%vm.modIndex), 4);
                                                 iSize+=2;
                                         } else vm.process_kill(process.pid, "illegal xor() p1");
                                         if (p2 == 0b01 && (p2=vm.readMem(PC+iSize, 1)-1) >= 0 && p2 < process.registers.length) {
@@ -286,7 +286,7 @@
                                                 iSize+=4;
                                         } else if (p2 == 0b11) {
                                                 p2 = vm.readMem(PC+iSize, 2);
-                                                p2 = vm.readMem(PC+p2, 4);
+                                                p2 = vm.readMem(PC+(p2%vm.modIndex), 4);
                                                 iSize+=2;
                                         } else vm.process_kill(process.pid, "illegal xor() p2");
                                         if (p3 == 0b01 && (p3=vm.readMem(PC+iSize, 1)-1) >= 0 && p3 < process.registers.length) {
