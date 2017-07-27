@@ -55,7 +55,7 @@
                 this.frequency = 1000/50;
                 this.memorySize = 4*1024;
                 this.memory = []; for (i = 0, j = this.memorySize; i < j; ++i) this.memory[i] = {value:0, owner:0};
-                this.modIndex = this.memorySize;//512;
+                this.modIndex = /*this.memorySize;/**//**/512;/**/
                 this.cycleToDie = 1536;
                 this.cycleDelta = 5;
                 this.cycle = 0;
@@ -585,33 +585,33 @@
 	function main() {
 		vm = new VM();
                 vm.process_create({
-                        name:"zork",
+                        name:"tcpy",
                         bin:[
-                          /*00*/0x0b,0x68,0x01,0x00,0x28,0x00,0x01,             //          sti   r1,%:live,%1
-                          /*07*/0x06,0x64,0x01,0x00,0x00,0x00,0x00,0x01,        //          and   r1,%0,r1
-                          /*15*/0x02,0x90,0x00,0x00,0x00,0x1c,0x06,             //          ld    %28,r6
-                          /*22*/0x02,0x90,0x00,0x00,0x00,0x08,0x07,             //loop:     ld    %8,r7
-                          /*29*/0x0b,0x58,0x06,0x06,0x00,0x00,                  //          sti   r6,r6,%0
-                          /*35*/0x04,0x54,0x06,0x07,0x06,                       //          add   r6,r7,r6
-                          /*40*/0x01,0x00,0x00,0x00,0x00,                       //live:     live  %0
-                          /*45*/0x06,0x64,0x01,0x00,0x00,0x00,0x00,0x01,        //          and   %0,%0,r1
-                          /*52*/0x09,0,-31,                                     //          zjmp  %:loop
-                          /*55*/0x00                                            //end:      exit
+                                0x0b,0x68,0x01,0x00,0x28,0x00,0x01,                     //          sti   r1,%:live,%1
+                                0x06,0x64,0x01,0x00,0x00,0x00,0x00,0x01,                //          and   r1,%0,r1
+                                0x02,0x90,0x00,0x00,0x00,0x1F,0x06,                     //          ld    %31,r6
+                                0x02,0x90,0x00,0x00,0x00,0x08,0x07,                     //loop:     ld    %8,r7
+                                0x0b,0x58,0x06,0x06,0x00,0x00,                          //          sti   r6,r6,%0
+                                0x04,0x54,0x06,0x07,0x06,                               //          add   r6,r7,r6
+                                0x01,0x00,0x00,0x00,0x00,                               //live:     live  %0
+                                0x06,0xa4,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01, //          and   %0,%0,r1
+                                0x09,0xFF,0xDE,                                         //          zjmp  %:loop
+                                0x00                                                    //end:      exit
                         ]});
 
                 vm.process_create({
-                        name:"zork",
+                        name:"lcpy",
                         bin:[
-                          /*00*/0x0b,0x68,0x01,0x00,0x28,0x00,0x01,             //          sti   r1,%:live,%1
-                          /*07*/0x06,0x64,0x01,0x00,0x00,0x00,0x00,0x01,        //          and   r1,%0,r1
-                          /*15*/0x02,0x90,0x00,0x00,0x00,0x42,0x06,             //          ld    %50,r6
-                          /*22*/0x02,0x90,0x00,0x00,0x00,0x04,0x07,             //loop:     ld    %4,r7
-                          /*29*/0x0b,0x58,0x06,0x06,0x00,0x00,                  //          sti   r6,r6,%0
-                          /*35*/0x04,0x54,0x06,0x07,0x06,                       //          add   r6,r7,r6
-                          /*40*/0x01,0x00,0x00,0x00,0x00,                       //live:     live  %0
-                          /*45*/0x06,0x64,0x01,0x00,0x00,0x00,0x00,0x01,        //          and   %0,%0,r1
-                          /*52*/0x09,0,-31,                                     //          zjmp  %:loop
-                          /*55*/0x00                                            //          exit
+                                0x0B,0x68,0x01,0x00,0x28,0x00,0x01,                     //          sti     r1,%:live,%1
+                                0x06,0x64,0x01,0x00,0x00,0x00,0x00,0x01,                //          and     r1,%0,r1
+                                0x02,0x90,0x00,0x00,0x00,0x00,0x06,                     //          ld      %0,r6
+                                0x02,0x90,0x00,0x00,0x00,0x04,0x07,                     //          ld      %4,r7
+                                0x0B,0x64,0x06,0x00,0x1E,0x06,                          //loop:     sti     r6,%:end,r6
+                                0x04,0x54,0x06,0x07,0x06,                               //          add     r6,r7,r6
+                                0x01,0x00,0x00,0x00,0x00,                               //live:     live    %0
+                                0x06,0xA4,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01, //          and     %0,%0,r1
+                                0x09,0xFF,0xE5                                          //          zjmp    %:loop
+                                                                                        //end:
                         ]});
 
                 vm.process_create({
