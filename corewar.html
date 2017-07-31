@@ -55,7 +55,7 @@
                 this.frequency = 1000/50;
                 this.memorySize = 4*1024;
                 this.memory = []; for (i = 0, j = this.memorySize; i < j; ++i) this.memory[i] = {value:0, owner:0};
-                this.modIndex = /*this.memorySize;/**//**/512;/**/
+                this.modIndex = /**/this.memorySize;/**//*512;/**/
                 this.cycleToDie = 1536;
                 this.cycleDelta = 5;
                 this.cycle = 0;
@@ -63,13 +63,14 @@
                 this.lastLivePid = 0;
 		this.processes = new Map();
 		this.lastPid = 0;
+                this.op_mul = 1;
                 this.instructions = [
-                        {code:0x00, name:"exit", clock_cycles:1,
+                        {code:0x00, name:"exit", clock_cycles:1*this.op_mul,
                                 call: function(process) {
                                         vm.process_kill(process.pid, "exit");
                                         process.instructionPtr = vm.fold(process.instructionPtr+1);
                                 }, vm:this},
-                        {code:0x01, name:"live", clock_cycles:10,
+                        {code:0x01, name:"live", clock_cycles:10*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var pid = vm.readMem(PC+1, 4);
@@ -80,7 +81,7 @@
                                         process.instructionPtr = vm.fold(PC+5);
                                         vm.nbrLive += 1;
                                 }, vm:this},
-                        {code:0x02, name:"ld", clock_cycles:5,
+                        {code:0x02, name:"ld", clock_cycles:5*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
@@ -105,7 +106,7 @@
                                         if (p4 != 0b00) vm.process_kill(process.pid, "illegal ld() p4");
                                         process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x03, name:"st", clock_cycles:5,
+                        {code:0x03, name:"st", clock_cycles:5*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
@@ -130,7 +131,7 @@
                                         if (p4 != 0b00) vm.process_kill(process.pid, "illegal st() p4");
                                         process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x04, name:"add", clock_cycles:10,
+                        {code:0x04, name:"add", clock_cycles:10*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
@@ -155,7 +156,7 @@
                                         if (p4 != 0b00)  vm.process_kill(process.pid, "illegal add() p4");
                                         process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x05, name:"sub", clock_cycles:10,
+                        {code:0x05, name:"sub", clock_cycles:10*this.op_mul,
                                 call: function(process) {
                                 var PC = process.instructionPtr;
                                 var format = vm.readMem(PC+1, 1);
@@ -180,7 +181,7 @@
                                 if (p4 != 0b00)  vm.process_kill(process.pid, "illegal sub() p4");
                                 process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x06, name:"and", clock_cycles:6,
+                        {code:0x06, name:"and", clock_cycles:6*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
@@ -219,7 +220,7 @@
                                         if (p4 != 0b00)  vm.process_kill(process.pid, "illegal and() p4");
                                         process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x07, name:"or", clock_cycles:6,
+                        {code:0x07, name:"or", clock_cycles:6*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
@@ -258,7 +259,7 @@
                                         if (p4 != 0b00)  vm.process_kill(process.pid, "illegal or() p4");
                                         process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x08, name:"xor", clock_cycles:6,
+                        {code:0x08, name:"xor", clock_cycles:6*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
@@ -297,14 +298,14 @@
                                         if (p4 != 0b00)  vm.process_kill(process.pid, "illegal xor() p4");
                                         process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x09, name:"zjmp", clock_cycles:20,
+                        {code:0x09, name:"zjmp", clock_cycles:20*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var index = vm.readMem(PC+1, 2);
                                         if (process.carry == 1) process.instructionPtr += vm.fold(index);
                                         else process.instructionPtr = vm.fold(PC+3);
                                 }, vm:this},
-                        {code:0x0a, name:"ldi", clock_cycles:25,
+                        {code:0x0a, name:"ldi", clock_cycles:25*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
@@ -339,7 +340,7 @@
                                         if (p4 != 0b00)  vm.process_kill(process.pid, "illegal ldi() p4");
                                         process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x0b, name:"sti", clock_cycles:25,
+                        {code:0x0b, name:"sti", clock_cycles:25*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
@@ -371,14 +372,14 @@
                                         vm.writeMem(target, p1, 4, process.pid);
                                         process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x0c, name:"fork", clock_cycles:800,
+                        {code:0x0c, name:"fork", clock_cycles:800*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var index = vm.readMem(PC+1, 2);
                                         vm.process_fork(process, vm.fold(PC+(index%vm.modIndex)));
                                         process.instructionPtr = vm.fold(PC+3);
                                 }, vm:this},
-                        {code:0x0d, name:"lld", clock_cycles:10,
+                        {code:0x0d, name:"lld", clock_cycles:10*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
@@ -403,7 +404,7 @@
                                         if (p4 != 0b00) vm.process_kill(process.pid, "illegal lld() p4");
                                         process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x0e, name:"lldi", clock_cycles:50,
+                        {code:0x0e, name:"lldi", clock_cycles:50*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
@@ -438,14 +439,14 @@
                                         if (p4 != 0b00)  vm.process_kill(process.pid, "illegal lldi() p4");
                                         process.instructionPtr = vm.fold(PC+iSize);
                                 }, vm:this},
-                        {code:0x0f, name:"lfork", clock_cycles:1000,
+                        {code:0x0f, name:"lfork", clock_cycles:1000*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var index = vm.readMem(PC+1, 2);
                                         vm.process_fork(process, vm.fold(PC+index));
                                         process.instructionPtr = vm.fold(PC+3);
                                 }, vm:this},
-                        {code:0x10, name:"aff", clock_cycles:2,
+                        {code:0x10, name:"aff", clock_cycles:2*this.op_mul,
                                 call: function(process) {
                                         var PC = process.instructionPtr;
                                         var format = vm.readMem(PC+1, 1);
